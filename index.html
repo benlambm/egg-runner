@@ -313,7 +313,7 @@ document.addEventListener('keydown', e => {
   if (gs !== 'playing') return;
   if (e.key === 'ArrowLeft') { s.egg.lane = Math.max(-1, s.egg.lane - 1); sfx('dodge'); }
   else if (e.key === 'ArrowRight') { s.egg.lane = Math.min(1, s.egg.lane + 1); sfx('dodge'); }
-  else if (e.key === 'ArrowUp' && !s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); if (s.egg.sweat === 0 && s.egg.sweatCooldown === 0) { s.egg.sweat = 1000; sfx('closecall'); } }
+  else if (e.key === 'ArrowUp' && !s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); }
   e.preventDefault();
 });
 
@@ -338,7 +338,7 @@ canvas.addEventListener('touchend', e => {
 
   if (absDy > absDx && dy < -THRESH) {
     // Swipe up = jump
-    if (!s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); if (s.egg.sweat === 0 && s.egg.sweatCooldown === 0) { s.egg.sweat = 1000; sfx('closecall'); } }
+    if (!s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); }
   } else if (absDx > absDy && absDx > THRESH) {
     // Swipe left/right = dodge
     if (dx < 0) s.egg.lane = Math.max(-1, s.egg.lane - 1);
@@ -458,7 +458,10 @@ function update(dt) {
         s.egg.cracked = true; gs = 'cracking'; s.crackTime = 0; sfx('crack'); return;
       }
     }
-    // Close call
+    // Sweat when jumping over an obstacle
+    if (dx < 40 && dy < 40 && s.egg.z >= 20 && s.egg.sweat === 0 && s.egg.sweatCooldown === 0) {
+      s.egg.sweat = 1000; sfx('closecall');
+    }
     if (o.y > 900) s.obs.splice(i, 1);
   }
 

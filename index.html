@@ -136,7 +136,7 @@ let lastTime = 0;
 function initState() {
   s = {
     dist: 0, speed: INIT_SPEED, time: 0, frames: 0,
-    egg: { lane: 0, x: 0, z: 0, vz: 0, jumping: false, cracked: false, sweat: 0 },
+    egg: { lane: 0, x: 0, z: 0, vz: 0, jumping: false, cracked: false, sweat: 0, sweatCooldown: 0 },
     obs: [], nextSpawn: 100, bgOff: 0, crackTime: 0
   };
 }
@@ -352,7 +352,12 @@ function update(dt) {
     s.egg.vz -= GRAVITY;
     if (s.egg.z <= 0) { s.egg.z = 0; s.egg.jumping = false; s.egg.vz = 0; }
   }
-  if (s.egg.sweat > 0) s.egg.sweat = Math.max(0, s.egg.sweat - dt);
+  if (s.egg.sweat > 0) {
+    s.egg.sweat = Math.max(0, s.egg.sweat - dt);
+    if (s.egg.sweat === 0) s.egg.sweatCooldown = 1000;
+  } else if (s.egg.sweatCooldown > 0) {
+    s.egg.sweatCooldown = Math.max(0, s.egg.sweatCooldown - dt);
+  }
 
   // Spawn
   if (s.dist > s.nextSpawn) {
@@ -382,7 +387,7 @@ function update(dt) {
       }
     }
     // Close call
-    if (!o.closeCalled) {
+    if (!o.closeCalled && s.egg.sweat === 0 && s.egg.sweatCooldown === 0) {
       if (dy < 40 && dx >= 40 && dx < 130) { s.egg.sweat = 1000; o.closeCalled = true; }
       else if (o.cat === 'flat' && dx < 40 && dy < 40 && s.egg.z >= 20 && s.egg.z < 55) { s.egg.sweat = 1000; o.closeCalled = true; }
     }
@@ -464,7 +469,10 @@ function drawNormalEgg() {
   ctx.fillStyle = '#000';
   ctx.beginPath(); ctx.arc(-10, -10, 4, 0, Math.PI * 2); ctx.arc(10, -10, 4, 0, Math.PI * 2); ctx.fill();
   // Mouth
-  ctx.beginPath(); ctx.arc(0, 0, 10, 0.2, Math.PI - 0.2); ctx.stroke();
+  ctx.beginPath();
+  if (s.egg.sweat > 0) ctx.arc(0, 8, 10, Math.PI + 0.2, -0.2);
+  else ctx.arc(0, 0, 10, 0.2, Math.PI - 0.2);
+  ctx.stroke();
   // Limbs
   ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.lineCap = 'round';
   const rc = s.time * 0.015;

@@ -339,7 +339,7 @@ function update(dt) {
     else if (r < 3/6)  { type='carton';  cat='tall'; w=50; h=90; }
     else if (r < 4/6)  { type='friedegg';cat='flat'; w=70; h=30; }
     else if (r < 5/6)  { type='knife';   cat='flat'; w=80; h=20; }
-    else               { type='butter';  cat='flat'; w=60; h=30; }
+    else               { type='butter';  cat='flat'; w=90; h=30; }
     s.obs.push({ type, cat, lane, y: -100, w, h, closeCalled: false });
     s.nextSpawn = s.dist + 150 + Math.random() * 200;
   }
@@ -593,15 +593,15 @@ function drawObstacle(type) {
       break;
     case 'butter':
       ctx.fillStyle = 'rgba(0,0,0,0.15)';
-      ctx.beginPath(); ctx.ellipse(0, 15, 35, 12, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, 15, 50, 10, 0, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#e2e8f0';
-      ctx.beginPath(); ctx.roundRect(-30, -5, 60, 15, 4); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(-45, -5, 90, 15, 4); ctx.fill();
       ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.stroke();
       ctx.fillStyle = '#fef08a';
-      ctx.beginPath(); ctx.roundRect(-20, -20, 40, 20, 2); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(-38, -20, 76, 20, 2); ctx.fill();
       ctx.strokeStyle = '#facc15'; ctx.lineWidth = 2; ctx.stroke();
       ctx.fillStyle = '#fef9c3';
-      ctx.beginPath(); ctx.roundRect(-16, -18, 32, 6, 1); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(-32, -18, 64, 6, 1); ctx.fill();
       break;
   }
 }

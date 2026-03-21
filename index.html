@@ -31,19 +31,14 @@ h2{font-size:48px;font-weight:900;color:#ef4444;letter-spacing:-2px;margin-botto
 .ctrl-row:last-child{margin-bottom:0}
 kbd{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fff;border:2px solid #e2e8f0;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);font-weight:bold;font-size:16px;color:#475569}
 .ctrl-label{color:#475569;font-weight:600;font-size:14px}
-.score-box{background:#fffbeb;padding:20px;border-radius:16px;border:2px solid #fef3c7;margin-bottom:24px}
-.score-label{color:rgba(120,53,15,0.6);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.score-val{font-size:48px;font-weight:900;color:#d97706;font-family:'Courier New',monospace}
 .hat-section{background:#f8fafc;padding:16px;border-radius:16px;border:2px solid #f1f5f9;margin-bottom:20px}
 .hat-section p{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
 .hat-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .hat-btn{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;transition:all 0.15s}
 .hat-btn:hover{background:#f8fafc}
 .hat-btn.active{background:#fbbf24;color:#451a03;border-color:#fbbf24;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1)}
-.unlock-box{background:#ecfdf5;padding:16px;border-radius:16px;border:2px solid #d1fae5;margin-bottom:20px;animation:popIn 0.5s ease}
-.unlock-box p{color:#059669;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.unlock-box .hat-name{color:#064e3b;font-weight:900;font-size:18px}
 .hat-preview-wrap{background:#fff;border-radius:12px;padding:4px;display:inline-block;border:1px solid #d1fae5;box-shadow:0 1px 3px rgba(0,0,0,0.05);margin-bottom:6px}
+.hat-name{color:#064e3b;font-weight:900;font-size:18px;margin-bottom:8px}
 .hud{position:absolute;top:24px;left:24px;background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);padding:8px 16px;border-radius:12px;border:2px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.05);z-index:5}
 .hud span{font-family:'Courier New',monospace;font-weight:700;font-size:20px;color:#1e293b}
 .hidden{display:none!important}
@@ -83,14 +78,10 @@ kbd{display:inline-flex;align-items:center;justify-content:center;width:32px;hei
     <div class="card">
       <h2>CRACKED!</h2>
       <p class="sub">You made an omelette.</p>
-      <div class="unlock-box hidden" id="unlockBox">
-        <p>New Hat Unlocked!</p>
-        <div class="hat-preview-wrap"><canvas id="hatPreview" width="80" height="80"></canvas></div>
-        <div class="hat-name" id="unlockName"></div>
-      </div>
       <div class="hat-section hidden" id="overHatSelect">
-        <p>Choose Your Hat</p>
+        <p id="overHatLabel">Choose Your Hat</p>
         <div class="hat-preview-wrap"><canvas id="overHatPreview" width="80" height="80"></canvas></div>
+        <div class="hat-name hidden" id="unlockName"></div>
         <div class="hat-grid" id="overHatGrid"></div>
       </div>
       <button class="btn" id="againBtn">PLAY AGAIN</button>
@@ -149,9 +140,9 @@ const $hud = document.getElementById('hud');
 const $hudDist = document.getElementById('hudDist');
 const $hatSelect = document.getElementById('hatSelect');
 const $hatGrid = document.getElementById('hatGrid');
-const $unlockBox = document.getElementById('unlockBox');
 const $unlockName = document.getElementById('unlockName');
 const $overHatSelect = document.getElementById('overHatSelect');
+const $overHatLabel = document.getElementById('overHatLabel');
 const $overHatGrid = document.getElementById('overHatGrid');
 const $overHatPreview = document.getElementById('overHatPreview');
 
@@ -205,7 +196,12 @@ function buildOverHatUI() {
     const btn = document.createElement('button');
     btn.className = 'hat-btn' + (id === equippedHat ? ' active' : '');
     btn.textContent = HAT_NAMES[id];
-    btn.onclick = () => { equippedHat = id; localStorage.setItem('er_equipped', id); buildOverHatUI(); drawOverHatPreview(); };
+    btn.onclick = () => {
+      equippedHat = id; localStorage.setItem('er_equipped', id);
+      $overHatLabel.textContent = 'Choose Your Hat';
+      $unlockName.classList.add('hidden');
+      buildOverHatUI();
+    };
     $overHatGrid.appendChild(btn);
   });
   drawOverHatPreview();
@@ -221,16 +217,12 @@ function showGameOver() {
     localStorage.setItem('er_hats', JSON.stringify(unlockedHats));
     equippedHat = newHatId;
     localStorage.setItem('er_equipped', newHatId);
-    $unlockBox.classList.remove('hidden');
+    $overHatLabel.textContent = 'New Hat Unlocked!';
     $unlockName.textContent = HAT_NAMES[newHatId];
-    // Draw unlock preview
-    const pc = document.getElementById('hatPreview').getContext('2d');
-    pc.clearRect(0, 0, 80, 80);
-    pc.save(); pc.translate(40, 60); pc.scale(1.5, 1.5);
-    drawHat(pc, newHatId, false, true);
-    pc.restore();
+    $unlockName.classList.remove('hidden');
   } else {
-    $unlockBox.classList.add('hidden');
+    $overHatLabel.textContent = 'Choose Your Hat';
+    $unlockName.classList.add('hidden');
   }
   buildOverHatUI();
 }

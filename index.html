@@ -31,6 +31,9 @@ h2{font-size:48px;font-weight:900;color:#ef4444;letter-spacing:-2px;margin-botto
 .ctrl-row:last-child{margin-bottom:0}
 kbd{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fff;border:2px solid #e2e8f0;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);font-weight:bold;font-size:16px;color:#475569}
 .ctrl-label{color:#475569;font-weight:600;font-size:14px}
+.score-row{display:flex;justify-content:center;gap:24px;margin-bottom:12px}
+.score-label{color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.score-val{font-size:22px;font-weight:900;color:#1e293b;font-family:'Courier New',monospace}
 .hat-section{background:#f8fafc;padding:16px;border-radius:16px;border:2px solid #f1f5f9;margin-bottom:20px}
 .hat-section p{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
 .hat-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -78,6 +81,10 @@ kbd{display:inline-flex;align-items:center;justify-content:center;width:32px;hei
     <div class="card">
       <h2>CRACKED!</h2>
       <p class="sub">You made an omelette.</p>
+      <div class="score-row">
+        <div><div class="score-label">Distance</div><div class="score-val" id="finalDist"></div></div>
+        <div><div class="score-label">Best</div><div class="score-val" id="bestDist"></div></div>
+      </div>
       <div class="hat-section hidden" id="overHatSelect">
         <p id="overHatLabel">Choose Your Hat</p>
         <div class="hat-preview-wrap"><canvas id="overHatPreview" width="80" height="80"></canvas></div>
@@ -181,6 +188,7 @@ function sfx(type) {
 // ── PERSISTED STATE ─────────────────────────────────────
 let unlockedHats = JSON.parse(localStorage.getItem('er_hats') || '["none"]');
 let equippedHat = localStorage.getItem('er_equipped') || 'none';
+let bestDist = parseFloat(localStorage.getItem('er_best') || '0');
 if (!unlockedHats.includes(equippedHat)) equippedHat = 'none';
 
 // ── GAME STATE ──────────────────────────────────────────
@@ -209,6 +217,8 @@ const $overHatSelect = document.getElementById('overHatSelect');
 const $overHatLabel = document.getElementById('overHatLabel');
 const $overHatGrid = document.getElementById('overHatGrid');
 const $overHatPreview = document.getElementById('overHatPreview');
+const $finalDist = document.getElementById('finalDist');
+const $bestDist = document.getElementById('bestDist');
 
 // ── FORMAT ──────────────────────────────────────────────
 function fmtDist(d) {
@@ -263,6 +273,10 @@ function buildOverHatUI() {
 
 function showGameOver() {
   $hud.classList.add('hidden'); $over.classList.remove('hidden');
+  // Score
+  $finalDist.textContent = fmtDist(s.dist);
+  if (s.dist > bestDist) { bestDist = s.dist; localStorage.setItem('er_best', bestDist); }
+  $bestDist.textContent = fmtDist(bestDist);
   // Unlock hat
   const avail = ALL_HATS.filter(h => !unlockedHats.includes(h));
   if (avail.length > 0) {

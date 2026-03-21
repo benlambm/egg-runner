@@ -313,7 +313,7 @@ document.addEventListener('keydown', e => {
   if (gs !== 'playing') return;
   if (e.key === 'ArrowLeft') { s.egg.lane = Math.max(-1, s.egg.lane - 1); sfx('dodge'); }
   else if (e.key === 'ArrowRight') { s.egg.lane = Math.min(1, s.egg.lane + 1); sfx('dodge'); }
-  else if (e.key === 'ArrowUp' && !s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); }
+  else if (e.key === 'ArrowUp' && !s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); if (s.egg.sweat === 0 && s.egg.sweatCooldown === 0) { s.egg.sweat = 1000; sfx('closecall'); } }
   e.preventDefault();
 });
 
@@ -338,7 +338,7 @@ canvas.addEventListener('touchend', e => {
 
   if (absDy > absDx && dy < -THRESH) {
     // Swipe up = jump
-    if (!s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); }
+    if (!s.egg.jumping) { s.egg.jumping = true; s.egg.vz = JUMP_STR; sfx('jump'); if (s.egg.sweat === 0 && s.egg.sweatCooldown === 0) { s.egg.sweat = 1000; sfx('closecall'); } }
   } else if (absDx > absDy && absDx > THRESH) {
     // Swipe left/right = dodge
     if (dx < 0) s.egg.lane = Math.max(-1, s.egg.lane - 1);
@@ -442,7 +442,7 @@ function update(dt) {
     else if (r < 4/6)  { type='friedegg';cat='flat'; w=70; h=30; }
     else if (r < 5/6)  { type='knife';   cat='flat'; w=80; h=20; }
     else               { type='butter';  cat='flat'; w=90; h=30; }
-    s.obs.push({ type, cat, lane, y: -100, w, h, closeCalled: false });
+    s.obs.push({ type, cat, lane, y: -100, w, h });
     s.nextSpawn = s.dist + 150 + Math.random() * 200;
   }
 
@@ -459,9 +459,6 @@ function update(dt) {
       }
     }
     // Close call
-    if (!o.closeCalled && s.egg.sweat === 0 && s.egg.sweatCooldown === 0) {
-      if (o.cat === 'flat' && dx < 40 && dy < 40 && s.egg.z >= 20 && s.egg.z < 55) { s.egg.sweat = 1000; o.closeCalled = true; sfx('closecall'); }
-    }
     if (o.y > 900) s.obs.splice(i, 1);
   }
 

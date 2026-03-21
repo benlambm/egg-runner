@@ -88,9 +88,10 @@ kbd{display:inline-flex;align-items:center;justify-content:center;width:32px;hei
         <div class="hat-preview-wrap"><canvas id="hatPreview" width="80" height="80"></canvas></div>
         <div class="hat-name" id="unlockName"></div>
       </div>
-      <div class="score-box">
-        <div class="score-label">Distance Traveled</div>
-        <div class="score-val" id="finalDist">0' 0"</div>
+      <div class="hat-section hidden" id="overHatSelect">
+        <p>Choose Your Hat</p>
+        <div class="hat-preview-wrap"><canvas id="overHatPreview" width="80" height="80"></canvas></div>
+        <div class="hat-grid" id="overHatGrid"></div>
       </div>
       <button class="btn" id="againBtn">PLAY AGAIN</button>
       <div class="controls-box small">
@@ -150,7 +151,9 @@ const $hatSelect = document.getElementById('hatSelect');
 const $hatGrid = document.getElementById('hatGrid');
 const $unlockBox = document.getElementById('unlockBox');
 const $unlockName = document.getElementById('unlockName');
-const $finalDist = document.getElementById('finalDist');
+const $overHatSelect = document.getElementById('overHatSelect');
+const $overHatGrid = document.getElementById('overHatGrid');
+const $overHatPreview = document.getElementById('overHatPreview');
 
 // ── FORMAT ──────────────────────────────────────────────
 function fmtDist(d) {
@@ -179,16 +182,37 @@ function startGame() {
   $hud.classList.remove('hidden');
 }
 document.getElementById('startBtn').onclick = startGame;
-document.getElementById('againBtn').onclick = () => { gs = 'start'; showStart(); };
+document.getElementById('againBtn').onclick = startGame;
 
 function showStart() {
   $start.classList.remove('hidden'); $over.classList.add('hidden'); $hud.classList.add('hidden');
   buildHatUI();
 }
 
+function drawOverHatPreview() {
+  const pc = $overHatPreview.getContext('2d');
+  pc.clearRect(0, 0, 80, 80);
+  pc.save(); pc.translate(40, 60); pc.scale(1.5, 1.5);
+  drawHat(pc, equippedHat, false, true);
+  pc.restore();
+}
+
+function buildOverHatUI() {
+  if (unlockedHats.length <= 1) { $overHatSelect.classList.add('hidden'); return; }
+  $overHatSelect.classList.remove('hidden');
+  $overHatGrid.innerHTML = '';
+  unlockedHats.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'hat-btn' + (id === equippedHat ? ' active' : '');
+    btn.textContent = HAT_NAMES[id];
+    btn.onclick = () => { equippedHat = id; localStorage.setItem('er_equipped', id); buildOverHatUI(); drawOverHatPreview(); };
+    $overHatGrid.appendChild(btn);
+  });
+  drawOverHatPreview();
+}
+
 function showGameOver() {
   $hud.classList.add('hidden'); $over.classList.remove('hidden');
-  $finalDist.textContent = fmtDist(s.dist);
   // Unlock hat
   const avail = ALL_HATS.filter(h => !unlockedHats.includes(h));
   if (avail.length > 0) {
@@ -199,7 +223,7 @@ function showGameOver() {
     localStorage.setItem('er_equipped', newHatId);
     $unlockBox.classList.remove('hidden');
     $unlockName.textContent = HAT_NAMES[newHatId];
-    // Draw preview
+    // Draw unlock preview
     const pc = document.getElementById('hatPreview').getContext('2d');
     pc.clearRect(0, 0, 80, 80);
     pc.save(); pc.translate(40, 60); pc.scale(1.5, 1.5);
@@ -208,12 +232,13 @@ function showGameOver() {
   } else {
     $unlockBox.classList.add('hidden');
   }
+  buildOverHatUI();
 }
 
 // ── INPUT ───────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (gs === 'start' && (e.key === ' ' || e.key === 'Enter')) { startGame(); e.preventDefault(); return; }
-  if (gs === 'gameover' && (e.key === ' ' || e.key === 'Enter')) { gs = 'start'; showStart(); e.preventDefault(); return; }
+  if (gs === 'gameover' && (e.key === ' ' || e.key === 'Enter')) { startGame(); e.preventDefault(); return; }
   if (gs !== 'playing') return;
   if (e.key === 'ArrowLeft') s.egg.lane = Math.max(-1, s.egg.lane - 1);
   else if (e.key === 'ArrowRight') s.egg.lane = Math.min(1, s.egg.lane + 1);
@@ -237,7 +262,7 @@ canvas.addEventListener('touchend', e => {
   const THRESH = 30;
 
   if (gs === 'start') { startGame(); e.preventDefault(); return; }
-  if (gs === 'gameover') { gs = 'start'; showStart(); e.preventDefault(); return; }
+  if (gs === 'gameover') { startGame(); e.preventDefault(); return; }
   if (gs !== 'playing') return;
 
   if (absDy > absDx && dy < -THRESH) {

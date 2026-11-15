@@ -33,6 +33,14 @@ Deployment is handled by the included GitHub Actions workflow whenever `main` ch
 
 The service worker caches everything for offline play. The manifest makes it installable. The `<meta>` tags handle iOS quirks. Ship it and forget it.
 
+## 🕰️ Two Games, One Year of AI Progress
+
+This game was first committed on March 21, 2026, as a single morning's work: four files, vanilla everything, no build step. It is kept here as the "before" picture.
+
+Its successor, [Egg Runner 2](https://github.com/benlambm/egg-runner-2) ([play it](https://benlambm.github.io/egg-runner-2/)), arrived on November 14, 2026, rebuilt from scratch out of a plain language description: modular code, a composed soundtrack, and automated players that prove the game is fair. Same author, same egg, eight months apart.
+
+Read together, the two repos are a small fossil record of how fast AI assisted building moved in 2026: from a helpful assistant beside a hand written file, to an agent that ships a tested game from a description. The game did not change. The leverage did.
+
 ## 📄 License
 
 **CC BY-NC 4.0** — [Creative Commons Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/)

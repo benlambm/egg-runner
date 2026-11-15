@@ -29,7 +29,7 @@ The egg icon lands right on your home screen next to your other apps. Launches f
 
 This entire installable mobile app is **four files**: `index.html`, `manifest.json`, `sw.js`, and two icons. That's it. No React, no Webpack, no node_modules black hole, no build step. Pure vanilla HTML/CSS/JS.
 
-Deployment? Push to GitHub, enable Pages, done. From `git push` to live mobile app in under 60 seconds. One branch, one click, zero config. 🥚🚀
+Deployment is handled by the included GitHub Actions workflow whenever `main` changes. From `git push` to live mobile app in under 60 seconds. One branch, one workflow, zero build config. 🥚🚀
 
 The service worker caches everything for offline play. The manifest makes it installable. The `<meta>` tags handle iOS quirks. Ship it and forget it.
 
